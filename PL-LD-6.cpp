@@ -399,3 +399,42 @@ bool searchR(const char field[10][10], char fig, int& x, int& y) {
 
     return false; // No available empty cell found
 }
+
+int main(int argc, char* argv[]) {
+    if (argc != 4) {
+        std::cerr << "Usage: " << argv[0] << " playerFigure source out" << std::endl;
+        return 1;
+    }
+
+    char playerFigure = argv[1][0];
+    char field[10][10];
+
+    // Read the field from the source file
+    if (!readField(argv[2], field)) {
+        std::cerr << "Error reading the field from file: " << argv[2] << std::endl;
+        return 1;
+    }
+
+    int bestMoveX = -1;
+    int bestMoveY = -1;
+
+    // Search for patterns and find the best move
+    if (search4(field, playerFigure, bestMoveX, bestMoveY) ||
+        search3(field, playerFigure, bestMoveX, bestMoveY) ||
+        search2(field, playerFigure, bestMoveX, bestMoveY) ||
+        searchR(field, playerFigure, bestMoveX, bestMoveY)) {
+        // Save the best move to the output file
+        if (!saveResult(argv[3], bestMoveX, bestMoveY)) {
+            std::cerr << "Error saving the result to file: " << argv[3] << std::endl;
+            return 1;
+        }
+
+        std::cout << "Best move: " << static_cast<char>('A' + bestMoveY) << bestMoveX << std::endl;
+    }
+    else {
+        std::cerr << "No valid move found." << std::endl;
+        return 1;
+    }
+
+    return 0;
+}
